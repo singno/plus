@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>plus test</title>
+	<meta charset="utf-8" />
+	<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+	<script src="./plus.js"></script>
+	<script>
+var passed = 'okay';
+
+test('each', function () {
+	var countIdx = 0,
+		countValue = 0,
+		countList;
+
+	_.each([1,2,3], function (val, idx, list) {
+		countIdx += idx;
+		countValue += val;
+		countList = list;
+	});
+
+	ok(countIdx === 0 + 1 + 2, passed);
+	ok(countValue === 1 + 2 + 3, passed);
+	deepEqual(countList, [1, 2, 3]);
+
+	_.each({
+		a: 1,
+		b: 2
+	}, function (val, key, obj) {
+		if (key === 'a') {
+			ok(val === 1, passed);
+		} else if (key === 'b') {
+			ok(val === 2, passed);
+		}
+	});
+
+});
+
+test('map', function () {
+	var list = _.map([1, 3, 5], function (val, idx, list) {
+		return val + 2;
+	});
+
+	deepEqual(list, [3, 5, 7]);
+
+	var list = _.map({
+		a: 1,
+		b: 2,
+		c: 3
+	}, function (val, key, obj) {
+		return val + 3;
+	}).sort();
+
+	deepEqual(list, [4, 5, 6])
+});
+
+test('reduce', function () {
+	var value = _.reduce([1, 2, 3], function (prev, current, idx, list) {
+		return prev + current;
+	}, 3);
+
+	equal(value, 9);
+
+	var value = _.reduce({
+		a: 1,
+		b: 2,
+		c: 3
+	}, function (prev, current, idx, list) {
+		return prev + current;
+	});
+
+	equal(value, 6);
+});
+
+test('reduceRight', function () {
+	var value = _.reduceRight([1, 2, 3], function (prev, current, idx, list) {
+		return prev - current;
+	});
+
+	equal(value, 0);
+
+	var value = _.reduceRight({
+		a: 1,
+		b: 2,
+		c: 3
+	}, function (prev, current, idx, list) {
+		return prev - current;
+	}, 10);
+
+	equal(value, 4); 
+});
+
+test('pluck', function () {
+	var array = _.pluck([{
+		age: 50,
+		name: 'joe'
+	}, {
+		age: 35,
+		name: 'jason'
+	}, {
+		age: 20,
+		name: 'jacket'
+	}], 'age');
+	
+	deepEqual(array, [50, 35, 20]);
+});
+
+test('find', function () {
+	var value = _.find([5, 4, 3, 2, -1, 0], function (val, idx, list) {
+		return idx === 4;
+	});
+
+	equal(value, -1);
+});
+
+test('filter', function () {
+	var value = _.filter([1, -1, 3, 5], function (val, idx, list) {
+		return val > 0;
+	});
+
+	deepEqual(value, [1, 3, 5]);
+});
+
+test('reject', function () {
+	var value = _.reject([1, -1, 3, 5], function (val, idx, list) {
+		return val > 0;
+	});
+
+	deepEqual(value, [-1]);
+});
+
+test('where', function () {
+	var value = _.where([{
+		age: 50,
+		idx: 0,
+		name: 'jason'
+	}, {
+		age: 50,
+		idx: 0,
+		name: 'rocket'
+	}, {
+		age: 50,
+		idx: 1,
+		name: 'tom'
+	}, {
+		age: 40,
+		idx: 0,
+		name: 'test'
+	}], {
+		age: 50,
+		idx: 0
+	});
+
+	deepEqual(value, [{
+		age:50,
+		idx: 0,
+		name: 'jason'
+	}, {
+		age: 50,
+		idx: 0,
+		name: 'rocket'
+	}]);
+});
+
+test('findWhere', function () {
+	var value = _.findWhere([{
+		age: 10,
+		name: 'jack'
+	}, {
+		age: 18,
+		name: 'tom'
+	}, {
+		age: 18,
+		name: 'jerry'
+	}], {
+		age: 18
+	});
+
+	deepEqual(value, {
+		age: 18,
+		name: 'tom'
+	});
+});
+
+test('every', function () {
+	var value = _.every([1, 9 ,10, 20], function (val, idx, list) {
+		return val > 0;
+	});
+
+	ok(value, passed);
+
+	var value = _.every({
+		a: 1,
+		b: 3,
+		c: 5,
+		d: 9
+	}, function (val, key, obj) {
+		return val > 0;
+	});
+
+	ok(value, passed);
+
+	var value = _.every({
+		a: -1,
+		c: 10,
+		d: 20
+	}, function (val, key, obj) {
+		return val > 0;
+	});
+
+	ok(!value, passed);
+});
+
+test('some', function () {
+	var value = _.some([1, 2, 4, -1], function (val, idx, list) {
+		return val < 0;
+	});
+
+	ok(value, passed);
+
+	var value = _.some({
+		a: -1,
+		b: -2,
+		c: 3
+	}, function (val, key, obj) {
+		return val > 0;
+	});
+
+	ok(value, passed);
+
+	var value = _.some({
+		a: -1,
+		b: -1,
+		c: -1
+	}, function (val, key, obj) {
+		return val > 0;
+	});
+
+	ok(!value, passed);
+});
+
+test('contains', function () {
+	var value = _.contains([1, 3, 5, 4, 9], 4);
+	ok(value, passed);
+
+	var value = _.contains({
+		a: 4,
+		c: 7,
+		d: 20
+	}, 20);
+	ok(value, passed);
+
+	var value = _.contains([1, -1, 0], -2);
+	ok(!value, passed);
+});
+
+test('size', function () {
+	var size = _.size([5, 3, 2, 1, 0]);
+	equal(size, 5);
+
+	var size = _.size({
+		a: 1,
+		b: 2,
+		c: 3
+	});
+	equal(size, 3);
+});
+
+test('toArray', function () {
+	var argv;
+	(function (a, b) {
+		argv = _.toArray(arguments);
+	})(1, 2);
+	deepEqual(argv, [1, 2]);
+
+	var array = _.toArray({
+		a: 1,
+		b: 2,
+		c: 3
+	}).sort();
+	deepEqual(array, [1, 2, 3]);
+});
+
+test('max', function () {
+	var value = _.max([3, 2, 1, 10]);
+	equal(value, 10);
+
+	var value = _.max({
+		a: 10,
+		b: 20, 
+		c: 30
+	});
+	equal(value, 30);
+
+	// iterator test
+	var value = _.max([{
+		age: 50,
+		name: 'jack'
+	}, {
+		age: 30,
+		name: 'tom'
+	}, {
+		age: 45,
+		name: 'jerry'
+	}], function (val, key, obj) {
+		return val.age;
+	});
+	deepEqual(value, {
+		age: 50,
+		name: 'jack'
+	});
+});
+
+test('min', function () {
+	var value = _.min([3, 2, 1, 10]);
+	equal(value, 1);
+
+	var value = _.min({
+		a: 10,
+		b: 20, 
+		c: 30
+	});
+	equal(value, 10);
+
+	// iterator test
+	var value = _.min([{
+		age: 50,
+		name: 'jack'
+	}, {
+		age: 30,
+		name: 'tom'
+	}, {
+		age: 45,
+		name: 'jerry'
+	}], function (val, key, obj) {
+		return val.age;
+	});
+	deepEqual(value, {
+		age: 30,
+		name: 'tom'
+	});
+});
+
+test('sortBy', function () {
+	var list = _.sortBy({
+		a: 4,
+		b: 3,
+		c: 5
+	});
+	deepEqual(list, [3,4,5]);
+
+	var list = _.sortBy([{
+		age: 40,
+		name: 'tom' 
+	}, {
+		age: 30,
+		name: 'jerry'
+	}, {
+		age: 50,
+		name: 'justin'
+	}], function (val, idx, list) {
+		return val.age;
+	});
+	deepEqual(list, [{
+		age: 30,
+		name: 'jerry'
+	}, {
+		age: 40,
+		name: 'tom'
+	}, {
+		age: 50,
+		name: 'justin'
+	}]);
+
+});
+
+test('groupBy', function () {
+	var list = _.groupBy(['one', 'two', 'three', 'four', 'five', 'six'], function (val) {
+		return val.length;
+	});
+	deepEqual(list, {
+		3: ['one', 'two', 'six'],
+		4: ['four', 'five'],
+		5: ['three']
+	});
+});
+
+test('indexBy', function () {
+	var obj = _.indexBy([{
+		age: 20,
+		name: 'jerry'
+	}, {
+		age: 30,
+		name: 'lucy'
+	}, {
+		age: 40,
+		name: 'tommy'
+	}], function (obj) {
+		return obj.age;
+	});
+
+	deepEqual(obj, {
+		'20': {
+			age: 20,
+			name: 'jerry'
+		},
+		'30': {
+			age: 30,
+			name: 'lucy'
+		},
+		'40': {
+			age: 40,
+			name: 'tommy'
+		}
+	});
+});
+
+test('countBy', function () {
+	var obj = _.countBy([1, 2, 3, 4, 5], function(num) {
+  		return num % 2 == 0 ? 'even': 'odd';
+	});
+	deepEqual(obj, {
+		odd: 3,
+		even: 2
+	});
+});
+
+// this test may not pass when shuffled the same sequence twice  
+test('shuffle', function () {
+	var source = [10,9,8,7,6,5,4,3,2,1];
+	notDeepEqual(_.shuffle(source), _.shuffle(source));
+
+	var source = {
+		a: 1,
+		b: 2,
+		c: 3,
+		d: 4,
+		e: 5,
+		f: 6,
+		g: 7,
+		h: 8,
+		i: 9,
+		j: 10
+	};
+	notDeepEqual(_.shuffle(source), _.shuffle(source));
+});
+
+test('sample', function () {
+	var source = [1, 3, 5, 7, 9],
+		sample = _.sample(source, 3);
+
+	ok(_.contains(source, sample[0]) && sample.length === 3, passed);
+});
+
+test('partition', function () {
+	var result = _.partition([1, 2, 3, 4, 5], function (val) {
+		return val % 2 === 0;
+	});
+	deepEqual(result, [[2, 4], [1, 3, 5]]);
+});
+
+test('first', function () {
+	var result = _.first([1,2,3,4], 3);
+	deepEqual(result, [1, 2, 3]);
+});
+
+test('last', function () {
+	var result = _.last([1,2,3,4]);
+	equal(result, 4);
+});
+
+test('indexOf', function () {
+	var source = [1, 3, 5, 7, 9, 3];
+
+	var idx = _.indexOf(source, 3);
+	equal(idx, 1);
+
+	var idx = _.indexOf(source, 3, 2);
+	equal(idx, 5);
+});
+
+test('lastIndexOf', function () {
+	var source = [1, 3, 5, 7, 9, 3];
+
+	var idx = _.lastIndexOf(source, 3);
+	equal(idx, 5);
+
+	var idx = _.lastIndexOf(source, 3, 4);
+	equal(idx, 1);
+});
+
+test('range', function () {
+	var list = _.range(1, 10, 2);
+	deepEqual(list, [1, 3, 5, 7, 9]);
+});
+
+test('uniq', function () {
+	var source = [1, 3, 5, 5, 7, 7, 9];
+
+	var list = _.uniq(source);
+	deepEqual(list, [1, 3, 5, 7, 9]);
+
+	var list = _.uniq(source, function (val) {
+		return 100;
+	});
+	deepEqual(list, [1]);
+});
+
+test('object', function () {
+	var result = {
+		tom: 50,
+		jerry: 60,
+		justin: 70
+	};
+
+	var list = _.object(['tom', 'jerry', 'justin'], [50, 60 , 70]);
+	deepEqual(list, result);
+
+	var list = _.object([['tom', 50], ['jerry', 60], ['justin', 70]]);
+	deepEqual(list, result);
+});
+
+test('compact', function () {
+	var list = _.compact([1, 0, false, null, undefined, 3, '', 5, 7, 9]);
+	deepEqual(list, [1, 3, 5, 7, 9]);
+});
+
+test('flatten', function () {
+	var source = [[[1,2,3], [4]], [5]];
+	var list = _.flatten(source);
+	deepEqual(list, [1,2,3,4,5]);
+
+	var list = _.flatten(source, true);
+	deepEqual(list, [[1,2,3], [4], 5]);
+});
+
+test('without', function () {
+	var list = _.without([1, -1, 3, 5, 9, 11], [1, 3], [2, 4], [5, 9]);
+	deepEqual(list, [-1, 11]);
+
+	var list = _.without([1, -1, 3, 5, 7], 3, 5);
+	deepEqual(list, [1, -1, 7]);
+});
+
+test('union', function () {
+	var list = _.union([1, 3, 5], [1, 2, 3, 4], [5, 6, 7, 8]).sort();
+	deepEqual(list, [1, 2, 3, 4, 5, 6, 7, 8]);
+});
+
+test('intersection', function () {
+	var list = _.intersection([1, 3, 5], [2, 3, 4, 5, 6], [2, 3, 5, 8]).sort();
+	deepEqual(list, [3, 5]);
+});
+
+test('insert', function () {
+	var list = _.insert([1,2,3], 1, 4, 3);
+	deepEqual(list, [1, 4, 3, 2, 3]);
+});
+
+test('after', function () {
+	var count = 1,
+		func = _.after(3, function () {
+			count++;
+		});
+
+	func();
+	func();
+	func();
+
+	equal(count, 2);
+});
+
+test('times', function () {
+	var count = 1,
+		result = _.times(3, function (i) {
+			// i 为第几次调用
+			return count++;
+		});
+
+	deepEqual(result, [1, 2, 3]);
+});
+
+test('once', function () {
+	var count = 1,
+		result,
+		func;
+
+	func = _.once(function () {
+		return ++count;
+	});
+
+	result = func();
+	equal(result, 2);
+
+	result = func();
+	equal(result, 2);
+});
+
+test('throttle', function () {
+	var count = 0,
+		func = _.throttle(function () {
+			count++;
+			equal(count, 1);
+			start();
+		}, 25);
+
+	func();
+	func();
+	func();
+
+	equal(count, 0);
+
+	// to support async test
+	stop();
+});
+
+test('debounce', function () {
+	var count = 0,
+		func = _.debounce(function () {
+			count++;
+		}, 25)
+
+	func();
+	equal(count, 1);
+
+	func();
+	func();
+	equal(count, 1);
+});
+
+test('bind', function () {
+	stop();
+
+	var isStop = true,
+		context = {
+			test: function () {
+				isStop &&  start();
+				equal(this, context);
+				isStop = false;
+			}
+		};
+	
+	var func = _.bind(context.test, context);
+	func();
+	
+	var func = _.bind(context, 'test');
+	func();
+});
+
+test('partial', function () {
+	var func = _.partial(function (a, b, c, d, e) {
+		return a + b + c + d + e;
+	}, 1, undefined, 3, undefined);
+
+	equal(func(2, 4, 5), 15);
+});
+
+test('wrap', function () {
+	stop();
+	var func = _.wrap(function () { 
+		return 'test';
+	}, function (func) {
+		equal(func(), 'test');
+		start();
+	});
+	func();
+});
+
+test('memoize', function () {
+	var fibonacci = _.memoize(function(n) {
+  		return n < 2 ? n: fibonacci(n - 1) + fibonacci(n - 2);
+	});
+
+	equal(fibonacci(10), 55);
+});
+
+test('delay', function () {
+	var count = 0,
+		func = _.delay(function () {
+			count++;
+		}, 25);
+
+	equal(count, 0);
+	stop();
+
+	setTimeout(function () {
+		equal(count, 1);
+		start();
+	}, 25);
+});
+
+test('defer', function () {
+	var count = 0,
+		func = _.defer(function () {
+			count++;
+		});
+
+	equal(count, 0);
+	stop();
+
+	setTimeout(function () {
+		equal(count, 1);
+		start();
+	}, 1);
+});
+
+test('extend', function () {
+	var obj = _.extend({}, {
+		a: 1,
+		b: 2
+	}, {
+		c: 3
+	});
+	deepEqual(obj, {
+		a: 1,
+		b: 2,
+		c: 3
+	});
+});
+
+test('has', function () {
+	var result = _.has({
+		a: 1
+	}, 'a');
+	ok(result, passed);
+});
+
+test('keys', function () {
+	var result = _.keys({
+		a: 1,
+		b: 2,
+		c: 3
+	}).sort();
+	deepEqual(result, ['a', 'b', 'c']);
+});
+
+test('values', function () {
+	var result = _.values({
+		a: 1,
+		b: 2,
+		c: 3
+	}).sort();
+	deepEqual(result, [1, 2, 3]);
+});
+
+test('result', function () {
+	var result = _.result({
+		a: {
+			b: 1
+		}
+	}, 'a.b');
+	equal(result, 1);
+
+	result = _.result({
+		a: 1
+	}, 'a.b');
+	equal(result, void 0);
+});
+
+test('invert', function () {
+	var obj = _.invert({
+		a: 1,
+		b: 2,
+		c: 3
+	});
+	deepEqual(obj, {
+		'1': 'a',
+		'2': 'b',
+		'3': 'c'
+	});
+});
+
+test('pairs', function () {
+	var array = _.pairs({
+		a: 1,
+		b: 2,
+		c: 3
+	});
+	deepEqual(array, [['a', 1], ['b', 2], ['c', 3]]);
+});
+
+test('functions', function () {
+	function TestObj () {
+		this.a = function () {};
+	}
+
+	TestObj.prototype = {
+		mark: function () {}
+	}; 
+
+	var funcs = _.functions(new TestObj());
+	deepEqual(funcs, ['a', 'mark']);
+});
+
+test('create', function () {
+	var proto = {
+		a: 1,
+		b: 2
+	},
+		obj = _.create(proto);
+
+	ok('a' in obj && !obj.hasOwnProperty('a'), passed);
+});
+
+test('pick', function () {
+	var result = _.pick({
+		age: 11,
+		name: 'john',
+		from: 'america',
+		sex: 'male'
+	}, 'age', 'sex');
+
+	deepEqual(result, {
+		age: 11,
+		sex: 'male'
+	});
+}); 
+
+test('omit', function () {
+	var result = _.omit({
+		age: 11,
+		name: 'john',
+		from: 'america',
+		sex: 'male'
+	}, 'age', 'sex');
+
+	deepEqual(result, {
+		name: 'john',
+		from: 'america'
+	});
+}); 
+
+test('isEqual', function () {
+	ok(!_.isEqual(0, -0));
+	ok(_.isEqual({
+		a: 1,
+		b: 2,
+		c: {
+			d: 1,
+			f: 2
+		}
+	}, {
+		a: 1,
+		b: 2,
+		c: {
+			d: 1,
+			f: 2
+		}
+	}), passed);
+	ok(_.isEqual([1, 2, 3, [1, 3, 5]], [1, 2, 3, [1, 3, 5]]), passed);
+});
+
+test('defaults', function () {
+	var obj;
+
+	function TestObj () {
+		this.value = null;
+	}
+
+	TestObj.prototype = {
+		a: 1,
+		b: 2
+	};
+
+	_.defaults(obj = new TestObj(), {
+		a: 3,
+		b: 2
+	}, {
+		c: 4
+	});
+
+	equal(obj.a, 1);
+	equal(obj.c, 4);
+});
+
+test('type', function () {
+	equal(_.type(1), 'number');
+	equal(_.type('1'), 'string');
+	equal(_.type(null), 'null');
+	equal(_.type(undefined), 'undefined');
+	equal(_.type({}), 'object');
+	equal(_.type([]), 'array');
+	equal(_.type(/./), 'regexp');
+	equal(_.type(new Date()), 'date');
+	equal(_.type(function () {}), 'function');
+	equal(_.type(arguments), 'arguments');
+});
+
+test('is', function () {
+	var array = [],
+		func = function () {},
+		num = 1,
+		str = '1',
+		nul = null,
+		undef = undefined,
+		argv = arguments,
+		reg = /./,
+		date = new Date();
+
+	ok(_.isArray(array), passed);
+	ok(!_.isArray(argv), passed);
+	ok(_.isFunction(func), passed);
+	ok(_.isString(str), passed);
+	ok(_.isString(new String('123')), passed)
+	ok(_.isNull(nul), passed);
+	ok(_.isUndefined(undef), passed);
+	ok(_.isArguments(argv), passed);
+	ok(_.isRegExp(reg), passed);
+	ok(_.isDate(date), passed);
+	ok(_.isBoolean(true), passed);
+	ok(_.isBoolean(new Boolean(true)), passed);
+	ok(_.isNumber(num), passed);
+	ok(_.isNumber(new Number(1)), passed);
+	ok(_.isError(new Error()), passed); 
+	ok(_.isObject(new String('1')), passed);
+	ok(_.isElement(document.createElement('div')), passed);
+});
+
+test('isEmpty', function () {
+	ok(_.isEmpty(''), passed);
+	ok(_.isEmpty(null), passed);
+	ok(_.isEmpty(undefined), passed);
+	ok(_.isEmpty({}), passed);
+	ok(_.isEmpty([]), passed);
+	ok(_.isEmpty(1), passed);
+	ok(_.isEmpty(false), passed);
+});
+        
+test('uniqueId', function () {
+	equal(_.uniqueId(), '1');
+	equal(_.uniqueId(), '2');
+});
+
+test('random', function () {
+	var val = _.random(1, 10);
+	ok(val <= 10 && val >= 1, passed);
+
+	var val = _.random(10);
+	ok(val <= 10 && val >= 0, passed);
+});
+
+test('query', function () {
+	var url = 'http://www.test.com/file.html?a=1&c=2&d=&3#hash';
+
+	// getQuery test
+	equal(_.query(url, 'a'), '1');
+	equal(_.query(url, 'f'), '');
+	deepEqual(_.query(url, ['a', 'c']), {
+		a: '1',
+		c: '2'
+	});
+	deepEqual(_.query(url, ['f', 'h']), {
+		'f': '',
+		'h': ''
+	});
+
+	// setQuery test
+	equal(_.query(url, 'a', '2'), 'http://www.test.com/file.html?a=2&c=2&d=&3#hash');
+	equal(_.query(url, 'f', '2'), 'http://www.test.com/file.html?a=1&c=2&d=&3&f=2#hash');
+	deepEqual(_.query(url, {
+		a: 2,
+		f: 2
+	}), 'http://www.test.com/file.html?a=2&c=2&d=&3&f=2#hash');
+
+	// no search but hash 
+	var url = 'http://www.test.com/file.html#hash';
+	equal(_.query(url, 'f'), '');
+
+	// set first, then get
+	equal(_.query(url, '中文', '测试'), 'http://www.test.com/file.html?%E4%B8%AD%E6%96%87=%E6%B5%8B%E8%AF%95#hash');
+
+	// get it
+	var setUrl = _.query(url, '中文', '测试'); 
+	equal(_.query(setUrl, '中文'), '测试');
+
+	// no search or hash
+	var url = 'http://www.test.com';
+	equal(_.query(url, 'a', 1), 'http://www.test.com?a=1');
+
+});
+
+test('dateFormat', function () {
+	var date = new Date(973836610010); // 2000,11,10 14:10:10:10
+
+	equal(_.dateFormat(date, 'yyyy-MM-dd HH-mm-ss'), '2000-11-10 14-10-10');
+});
+	</script>
+</body>
+</html>
