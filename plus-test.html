@@ -8,7 +8,7 @@
 <body>
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
-	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+	<script src="http://code.jquery.com/qunit/qunit-1.14.0.js"></script>
 	<script src="./plus.js"></script>
 	<script>
 var passed = 'okay';
@@ -988,6 +988,8 @@ test('dateFormat', function () {
 	var date = new Date(973836610010); // 2000,11,10 14:10:10:10
 
 	equal(_.dateFormat(date, 'yyyy-MM-dd HH-mm-ss'), '2000-11-10 14-10-10');
+
+	equal(_.dateFormat(date, 'yyyy年MM月dd日'), '2000年11月10日');
 });
 	</script>
 </body>

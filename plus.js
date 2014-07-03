@@ -1297,6 +1297,11 @@
 					result += formatter(previous);
 					offset += previous.length;
 					previous = format.charAt(offset - 1);
+
+					if (offset >= length) {
+						result += previous;
+					}
+
 					break;
 				} else {
 					previous = previous.slice(0, -1);
