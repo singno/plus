@@ -1070,7 +1070,7 @@
 			return obj.length === 0;
 		}
 
-		for (key in obj) {
+		for (var key in obj) {
 			if (_.has(obj, key)) {
 				return false;
 			}
@@ -1177,6 +1177,99 @@
 		}
 
 		return url + result;
+	};
+
+	_.cookie = {
+		get: function (what) {
+			var cookieArray = document.cookie.split('; '),
+				e = encodeURIComponent,
+				de = decodeURIComponent;
+
+			if (_.type(what) === 'array') {
+				var obj = {},
+					ret = {};
+
+				_.each(cookieArray, function (val, idx) {
+					var pair = val.split('=');
+
+					obj[de(pair[0])] = de(pair[1]);
+				});
+
+				_.each(what, function (val, idx) {
+					if (obj.hasOwnProperty(val)) {
+						ret[val] = obj[val];
+					} else {
+						ret[val] = null;
+					}
+				});
+			} else {
+				what = e(what);
+
+				for (var i = 0, len = cookieArray.length; i < len; i++) {
+					var pair = cookieArray[i].split('=');
+
+					if (pair[0] === what) {
+						return de(pair[1]);
+					}
+				}
+
+				return null;
+			}
+
+			return null;
+		},
+
+		set: function (name, value, opt) {
+			if (_.type(name) === 'array') {
+				_.each(name, function (val, idx) {
+					var opts = _.extend({}, value, val);
+					_.cookie.set(opts);
+				});
+			} else if (_.type(name) === 'object') {
+				var obj = name;
+				_.cookie.set(obj.name, obj.value, obj);
+			} else {
+				var arr = [
+					decodeURIComponent(name) + '=' + decodeURIComponent(value)
+				];
+
+				opt = opt || {};
+
+				if (opt.expires != null) {
+					arr.push('expires=' + new Date(opt.expires));
+				}
+
+				if (opt.domain) {
+					arr.push('domain=' + opt.domain);
+				}
+
+				if (opt.path) {
+					arr.push('path=' + opt.path);
+				}
+
+				document.cookie = arr.join(';');
+			}
+		},
+
+		del: function (name, opt) {
+			var expires = new Date(0);
+
+			if (_.type(name) === 'array') {
+				_.each(name, function (val) {
+					val.expires = expires;
+					val.value = '';
+				});
+
+				_.cookie.set(name, opt);
+			} else if (_.type(name) === 'object') {
+				name.expires = expires;
+				_.cookie.set(name);
+			} else {
+				_.cookie.set(name, '', {
+					expires: expires
+				});
+			}
+		}
 	};
 
 	/*
