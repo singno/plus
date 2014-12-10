@@ -791,6 +791,21 @@
 		return target;
 	};
 
+	_.toObject = function (str, sep) {
+		str += '';
+		sep = sep || '&';
+
+		var array = str.split(sep),
+			ret = {};
+
+		_.each(array, function (val, idx) {
+			var pair = val.split('=');
+			ret[pair[0]] = pair[1];
+		});
+
+		return ret;
+	};
+
 	_.has = function (obj, key) {
 		return hasOwn.call(obj, key);
 	};
@@ -1199,9 +1214,11 @@
 					if (obj.hasOwnProperty(val)) {
 						ret[val] = obj[val];
 					} else {
-						ret[val] = null;
+						ret[val] = '';
 					}
 				});
+
+				return ret;
 			} else {
 				what = e(what);
 
@@ -1213,10 +1230,8 @@
 					}
 				}
 
-				return null;
-			}
-
-			return null;
+				return '';
+			}	
 		},
 
 		set: function (name, value, opt) {
