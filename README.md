@@ -942,6 +942,37 @@ alias: _.proxy *as jQuery.proxy*
 	var date = new Date(973836610010); // 2000,11,10 14:10:10:10
 	_.dateFormat(date, 'yyyy-MM-dd HH-mm-ss');
 	=> '2000-11-10 14-10-10'
+
+#### _.socialTime(ts, now)
+将时间戳格式化为社会化时间。ts: 要格式化的时间戳，now当前服务器时间（不传则用客户端时间）
+
+	_.socialTime(+new Date());
+	=> 刚刚
+
+#### _.cookie
+cookie存取函数。
+
+	_.cookie.set('name', 'value');
+	_.cookie.set({
+		name1: 'value1',
+		name2: 'value2'
+	});
+	_.cookie.get('name');
+	=> 'value'
+	_.cookie.get(['name1', 'name2']);
+	=> {
+		name1: 'value1',
+		name2: 'value2'
+	}
+
+####_.toObject(serialStr)
+URL参数转换为Object对象
+
+	_.cookie.toObject('a=b&c=d'); 
+	=> {
+		a: 'b',
+		c: 'd'
+	}
 	
 	
 

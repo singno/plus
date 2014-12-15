@@ -1420,6 +1420,41 @@
 		return result;
 	};
 
+	_.socialTime = function (ts, now) {
+		now = now || _.now();
+
+		var minute = 1000 * 60;
+		var hour = minute * 60;
+		var day = hour * 24;
+		var week = day * 7;
+		var month = day * 30;
+
+		// 已流逝的时间
+		var escape = now - ts;
+
+		if(escape < 0){
+			throw new Error('Format Error');
+		}
+
+		if(escape >= month){
+		 	return parseInt(escape / month) + '个月前';
+		 }
+		 else if(escape >= week){
+		 	return parseInt(escape / week) + '周前';
+		 }
+		 else if(escape >= day){
+		 	return parseInt(escape / day) + '天前';
+		 }
+		 else if(escape >= hour){
+		 	return parseInt(escape / hour) + '个小时前';
+		 }
+		 else if(escape >= minute){
+		 	return parseInt(escape / minute) + '分钟前';
+		 } else {
+		 	return '刚刚发表';
+		 }
+	};
+
 	_.identity = function (value) {
 		return value;
 	};
