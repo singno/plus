@@ -1451,7 +1451,7 @@
 		 else if(escape >= minute){
 		 	return parseInt(escape / minute) + '分钟前';
 		 } else {
-		 	return '刚刚发表';
+		 	return '刚刚';
 		 }
 	};
 
